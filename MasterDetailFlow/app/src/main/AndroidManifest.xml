@@ -30,8 +30,8 @@
                 android:value=".ArtistListActivity" />
         </activity>
 
-        <provider android:name=".DictionaryProvider"
-            android:authorities="dictionary"
+        <provider android:name= ".data.ArtistProvider"
+            android:authorities="artistProvider"
             android:syncable="false" />
 
     </application>
