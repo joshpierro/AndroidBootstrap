@@ -3,12 +3,10 @@ package pierro.dallett.josh.masterdetailflow.data;
 import android.app.SearchManager;
 import android.content.ContentProvider;
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
-import android.util.Log;
 
 /**
  * Created by jpierro on 7/10/2015.
@@ -35,11 +33,14 @@ public class ArtistProvider extends ContentProvider {
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
 
-        String[] columnNames = {"_ID", "artist", SearchManager.SUGGEST_COLUMN_TEXT_1};
+        projection = new String[]{"_ID", SearchManager.SUGGEST_COLUMN_TEXT_1,"_ID AS " + SearchManager.SUGGEST_COLUMN_INTENT_DATA};
+        sortOrder = SearchManager.SUGGEST_COLUMN_TEXT_1;
+        selection = String.format("%s Like ?",SearchManager.SUGGEST_COLUMN_TEXT_1);
+        selectionArgs[0] = selectionArgs[0] + "%";
 
         SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
         queryBuilder.setTables(ArtistContract.ArtistEntry.TABLE_NAME);
-        Cursor cursor = queryBuilder.query(mArtistDatabase,columnNames,null,null,null,null,null);
+        Cursor cursor = queryBuilder.query(mArtistDatabase,projection,selection,selectionArgs,null,null,sortOrder + " LIMIT 25");
         return cursor;
     }
 

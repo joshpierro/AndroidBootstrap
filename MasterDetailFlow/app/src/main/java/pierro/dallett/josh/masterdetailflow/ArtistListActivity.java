@@ -3,12 +3,14 @@ package pierro.dallett.josh.masterdetailflow;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
+
+import pierro.dallett.josh.masterdetailflow.data.ArtistDatabaseHelper;
 
 
 /**
@@ -35,11 +37,14 @@ public class ArtistListActivity extends AppCompatActivity
      * device.
      */
     private boolean mTwoPane;
+    ArtistDatabaseHelper mArtistDatabase;
+    ArtistListFragment mArtistListFragment;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu, menu);
+        mArtistDatabase = new ArtistDatabaseHelper(this);
 
         // Associate searchable configuration with the SearchView
         SearchManager searchManager =
@@ -54,14 +59,27 @@ public class ArtistListActivity extends AppCompatActivity
 
     @Override
     protected void onNewIntent(Intent intent) {
-        // handleIntent(intent);
-        Log.i("xx", "got intent");
+
+        String query = "";
+        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+            // Handle the normal search query case
+           query = intent.getStringExtra(SearchManager.QUERY);
+        }else{
+            Uri data = intent.getData();
+            query = mArtistDatabase.getSearchTerm(Integer.parseInt(data.getLastPathSegment()));
+        }
+
+        if(mArtistListFragment!=null && query != ""){
+            mArtistListFragment.artistSearch(query);
+        }
+        return;
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_artist_list);
+        mArtistListFragment = (ArtistListFragment) getSupportFragmentManager().findFragmentById(R.id.artist_list);
 
         getSupportActionBar();
 

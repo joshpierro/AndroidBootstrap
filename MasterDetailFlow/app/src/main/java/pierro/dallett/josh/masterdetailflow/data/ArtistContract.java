@@ -1,5 +1,6 @@
 package pierro.dallett.josh.masterdetailflow.data;
 
+import android.app.SearchManager;
 import android.content.ContentUris;
 import android.net.Uri;
 import android.provider.BaseColumns;
@@ -26,7 +27,7 @@ public class ArtistContract {
 
         public static final String TABLE_NAME = "artist_table";
         public static final String COLUMN_ARTIST = "artist";
-        public static final String SUGGEST_COLUMN_TEXT_1 = "SUGGEST_COLUMN_TEXT_1";
+        public static final String SUGGEST_COLUMN_TEXT_1 = SearchManager.SUGGEST_COLUMN_TEXT_1;
 
         //Columns to display.
         public static final String sColumnsToDisplay [] =

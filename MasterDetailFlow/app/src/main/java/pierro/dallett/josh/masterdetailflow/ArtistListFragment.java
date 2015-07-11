@@ -3,10 +3,10 @@ package pierro.dallett.josh.masterdetailflow;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-
 
 import pierro.dallett.josh.masterdetailflow.dummy.DummyContent;
 
@@ -148,5 +148,11 @@ public class ArtistListFragment extends ListFragment {
         }
 
         mActivatedPosition = position;
+    }
+
+    public void artistSearch(String artist){
+
+        Log.i("xx - from activity",artist);
+
     }
 }
