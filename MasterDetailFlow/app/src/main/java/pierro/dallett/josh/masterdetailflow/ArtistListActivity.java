@@ -7,10 +7,12 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 
 import pierro.dallett.josh.masterdetailflow.data.ArtistDatabaseHelper;
+import pierro.dallett.josh.masterdetailflow.data.ArtistRequest;
 
 
 /**
@@ -39,6 +41,7 @@ public class ArtistListActivity extends AppCompatActivity
     private boolean mTwoPane;
     ArtistDatabaseHelper mArtistDatabase;
     ArtistListFragment mArtistListFragment;
+    int mCounter = 0;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -57,22 +60,44 @@ public class ArtistListActivity extends AppCompatActivity
     }
 
 
+
+
     @Override
     protected void onNewIntent(Intent intent) {
 
         String query = "";
-        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-            // Handle the normal search query case
-           query = intent.getStringExtra(SearchManager.QUERY);
-        }else{
-            Uri data = intent.getData();
-            query = mArtistDatabase.getSearchTerm(Integer.parseInt(data.getLastPathSegment()));
+
+        Log.i("xx",String.valueOf(mCounter));
+
+        //this was added because there is a bug that calls the onNewIntent twice from the search component
+        if(mCounter>0){
+            mCounter = 0;
+            return;
+        }
+        else{
+
+            if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+                // Handle the normal search query case
+                query = intent.getStringExtra(SearchManager.QUERY);
+            }else{
+                //suggestion
+                Uri data = intent.getData();
+                query = mArtistDatabase.getSearchTerm(Integer.parseInt(data.getLastPathSegment()));
+                mCounter=+1;
+            }
+
+
+            ArtistRequest artistRequest = new ArtistRequest(this);
+            artistRequest.execute(query);
+            mCounter = 0;
         }
 
-        if(mArtistListFragment!=null && query != ""){
+
+      /*  if(mArtistListFragment!=null && query != ""){
             mArtistListFragment.artistSearch(query);
-        }
-        return;
+        }*/
+
+
     }
 
     @Override
@@ -108,13 +133,14 @@ public class ArtistListActivity extends AppCompatActivity
 
 
     @Override
-    public void onItemSelected(String id) {
+    public void onItemSelected(String name) {
         if (mTwoPane) {
             // In two-pane mode, show the detail view in this activity by
             // adding or replacing the detail fragment using a
             // fragment transaction.
             Bundle arguments = new Bundle();
-            arguments.putString(ArtistDetailFragment.ARG_ITEM_ID, id);
+            //arguments.putString(ArtistDetailFragment.ARG_ITEM_ID, id);
+            arguments.putString("ArtistName", name);
             ArtistDetailFragment fragment = new ArtistDetailFragment();
             fragment.setArguments(arguments);
             getSupportFragmentManager().beginTransaction()
@@ -125,7 +151,7 @@ public class ArtistListActivity extends AppCompatActivity
             // In single-pane mode, simply start the detail activity
             // for the selected item ID.
             Intent detailIntent = new Intent(this, ArtistDetailActivity.class);
-            detailIntent.putExtra(ArtistDetailFragment.ARG_ITEM_ID, id);
+            detailIntent.putExtra(ArtistDetailFragment.ARG_ITEM_ID, name);
             startActivity(detailIntent);
         }
     }

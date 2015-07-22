@@ -33,6 +33,10 @@ public class ArtistProvider extends ContentProvider {
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
 
+        //TODO un-hard code the parameters and operators used in the query
+        //These are hardcoded to support the fuzzy search from the search widget
+        //However, the search is the only thing this provider is used for.
+
         projection = new String[]{"_ID", SearchManager.SUGGEST_COLUMN_TEXT_1,"_ID AS " + SearchManager.SUGGEST_COLUMN_INTENT_DATA};
         sortOrder = SearchManager.SUGGEST_COLUMN_TEXT_1;
         selection = String.format("%s Like ?",SearchManager.SUGGEST_COLUMN_TEXT_1);

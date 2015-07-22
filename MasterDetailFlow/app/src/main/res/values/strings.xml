@@ -3,4 +3,5 @@
     <string name="title_artist_detail">Artist Detail</string>
     <string name="loading">Loading Artists</string>
     <string name="search_title">Search For Artists</string>
+    <string name="placeholder_image">http://whereshappening.com/nanodegree/placeholder-image.png</string>
 </resources>

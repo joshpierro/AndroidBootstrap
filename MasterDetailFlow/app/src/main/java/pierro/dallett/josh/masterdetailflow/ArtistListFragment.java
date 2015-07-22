@@ -1,14 +1,22 @@
 package pierro.dallett.josh.masterdetailflow;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
-import android.util.Log;
+import android.support.v4.content.LocalBroadcastManager;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import pierro.dallett.josh.masterdetailflow.dummy.DummyContent;
+import java.util.ArrayList;
+import java.util.List;
+
+import pierro.dallett.josh.masterdetailflow.Adapters.ArtistAdapter;
+import pierro.dallett.josh.masterdetailflow.data.ArtistListItem;
+import pierro.dallett.josh.masterdetailflow.data.Settings;
 
 /**
  * A list fragment representing a list of Artists. This fragment
@@ -20,6 +28,9 @@ import pierro.dallett.josh.masterdetailflow.dummy.DummyContent;
  * interface.
  */
 public class ArtistListFragment extends ListFragment {
+
+    ArtistAdapter  mArtistListAdapter;
+    ArrayList<ArtistListItem> mArtistsList;
 
     /**
      * The serialization (saved instance state) Bundle key representing the
@@ -67,16 +78,69 @@ public class ArtistListFragment extends ListFragment {
     public ArtistListFragment() {
     }
 
+
+    // Our handler for received Intents. This will be called whenever an Intent
+// with an action named "custom-event-name" is broadcasted.
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            mArtistsList.clear();
+            List<ArtistListItem> artistSearchList = Settings.getInstance().ArtistList;
+            for(ArtistListItem a:artistSearchList){
+                ArtistListItem artist = new ArtistListItem();
+                artist.Id = a.Id;
+                artist.Name = a.Name;
+                artist.ImageURL = a.ImageURL;
+                mArtistsList.add(a);
+            }
+            mArtistListAdapter.notifyDataSetChanged();
+        }
+    };
+
+
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // TODO: replace with a real list adapter.
+        ArtistListItem x = new ArtistListItem();
+        x.Name = "qwww";
+
+
+        mArtistsList = new ArrayList();
+
+        mArtistsList.add(x);
+
+        if(Settings.getInstance().ArtistList!=null){
+            for(ArtistListItem a: Settings.getInstance().ArtistList){
+                mArtistsList.add(a);
+            }
+        }
+
+       mArtistListAdapter = new ArtistAdapter(
+               getActivity(),
+                R.layout.list_item_artists,
+                mArtistsList);
+
+        setListAdapter(mArtistListAdapter);
+
+/*
         setListAdapter(new ArrayAdapter<DummyContent.DummyItem>(
                 getActivity(),
                 android.R.layout.simple_list_item_activated_1,
                 android.R.id.text1,
-                DummyContent.ITEMS));
+                DummyContent.ITEMS));*/
+
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mMessageReceiver,
+                new IntentFilter("recieveArtistUpdate"));
+
+    }
+
+    @Override
+    public void onDestroy() {
+        // Unregister since the activity is about to be closed.
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
+        super.onDestroy();
     }
 
     @Override
@@ -113,10 +177,9 @@ public class ArtistListFragment extends ListFragment {
     @Override
     public void onListItemClick(ListView listView, View view, int position, long id) {
         super.onListItemClick(listView, view, position, id);
-
         // Notify the active callbacks interface (the activity, if the
         // fragment is attached to one) that an item has been selected.
-        mCallbacks.onItemSelected(DummyContent.ITEMS.get(position).id);
+        mCallbacks.onItemSelected(mArtistsList.get(position).Name);
     }
 
     @Override
@@ -150,9 +213,9 @@ public class ArtistListFragment extends ListFragment {
         mActivatedPosition = position;
     }
 
-    public void artistSearch(String artist){
 
-        Log.i("xx - from activity",artist);
 
-    }
+
+
+
 }

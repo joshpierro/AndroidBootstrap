@@ -14,7 +14,7 @@ import java.util.ArrayList;
 public class ArtistDatabaseHelper  extends SQLiteOpenHelper {
 
     private static String DATABASE_NAME = "artist_db";
-    private static int DATABASE_VERSION = 12;
+    private static int DATABASE_VERSION = 13;
 
     final String SQL_CREATE_ARTIST_TABLE =
             "CREATE TABLE "
@@ -41,9 +41,9 @@ public class ArtistDatabaseHelper  extends SQLiteOpenHelper {
         Cursor cursor = artistDatabse.rawQuery(artistQuery, null);
         String searchTerm = "";
         if (cursor.moveToFirst()){
-            ArrayList<Artist> artistList = new ArrayList<Artist>();
+            ArrayList<ArtistCacheItem> artistList = new ArrayList<ArtistCacheItem>();
             do{
-                Artist artist = new Artist();
+                ArtistCacheItem artist = new ArtistCacheItem();
                 artist.Id = id;
                 artist.Artist = cursor.getString(1);
                 artistList.add(artist);
@@ -59,14 +59,14 @@ public class ArtistDatabaseHelper  extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(SQL_CREATE_ARTIST_TABLE);
-        db.execSQL("INSERT INTO artist_table (suggest_text_1) VALUES ('Picasso')");
-        db.execSQL("INSERT INTO artist_table (suggest_text_1) VALUES ('Titian')");
-        db.execSQL("INSERT INTO artist_table (suggest_text_1) VALUES ('Munch')");
-        db.execSQL("INSERT INTO artist_table (suggest_text_1) VALUES ('Escher')");
-        db.execSQL("INSERT INTO artist_table (suggest_text_1) VALUES ('Warhol')");
-        db.execSQL("INSERT INTO artist_table (suggest_text_1) VALUES ('Koons')");
-        db.execSQL("INSERT INTO artist_table (suggest_text_1) VALUES ('Gilbert and George')");
-        db.execSQL("INSERT INTO artist_table (suggest_text_1) VALUES ('Witkin')");
+        db.execSQL("INSERT INTO artist_table (suggest_text_1) VALUES ('Bad Brains')");
+        db.execSQL("INSERT INTO artist_table (suggest_text_1) VALUES ('Crass')");
+        db.execSQL("INSERT INTO artist_table (suggest_text_1) VALUES ('Sex Pistols')");
+        db.execSQL("INSERT INTO artist_table (suggest_text_1) VALUES ('Dead Milkmen')");
+        db.execSQL("INSERT INTO artist_table (suggest_text_1) VALUES ('False Prophets')");
+        db.execSQL("INSERT INTO artist_table (suggest_text_1) VALUES ('Dead Kennedys')");
+        db.execSQL("INSERT INTO artist_table (suggest_text_1) VALUES ('Subhmans')");
+        db.execSQL("INSERT INTO artist_table (suggest_text_1) VALUES ('Butthole Surfers')");
     }
 
 
