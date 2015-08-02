@@ -15,6 +15,10 @@ public class MainActivity extends ActionBarActivity {
 
     private DrawingView drawView;
     private ImageButton currPaint;
+    private ImageButton eraseBtn;
+    private ImageButton newBtn;
+    private ImageButton undoBtn;
+    private ImageButton redoBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +32,40 @@ public class MainActivity extends ActionBarActivity {
         LinearLayout paintLayout = (LinearLayout)findViewById(R.id.paint_colors);
         currPaint = (ImageButton)paintLayout.getChildAt(0);
         currPaint.setImageDrawable(getResources().getDrawable(R.drawable.paint_pressed));
+
+        eraseBtn = (ImageButton)findViewById(R.id.erase_btn);
+        eraseBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                drawView.setErase(true);
+                drawView.setBrushSize(20);
+            }
+        });
+
+        newBtn = (ImageButton)findViewById(R.id.new_btn);
+        newBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                drawView.startNew();
+            }
+        });
+
+        undoBtn = (ImageButton)findViewById(R.id.undo_btn);
+        undoBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                drawView.undo();
+            }
+        });
+
+        redoBtn = (ImageButton) findViewById(R.id.redo_btn);
+        redoBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                drawView.redo();
+            }
+        });
 
 
     }

@@ -15,6 +15,8 @@ import android.view.View;
 
 import com.whereshappening.myapplication.R;
 
+import java.util.ArrayList;
+
 /**
  * Created by pierro on 7/30/15.
  */
@@ -30,23 +32,42 @@ public class DrawingView extends View {
     private Canvas drawCanvas;
     //canvas bitmap
     private Bitmap canvasBitmap;
+
+
     //brush sizes
     private float brushSize, lastBrushSize;
     //erase flag
     private boolean erase=false;
+
+    private Path lastdrawPath;
+    private Paint lastdrawPaint;
+
 
     public DrawingView(Context context, AttributeSet attrs){
         super(context, attrs);
         setupDrawing();
     }
 
+
+
+
+
     //setup drawing
     private void setupDrawing(){
-
         //prepare for drawing and setup paint stroke properties
         brushSize = getResources().getInteger(R.integer.medium_size);
         lastBrushSize = brushSize;
+        setPath();
+        setPaint();
+        canvasPaint = new Paint(Paint.DITHER_FLAG);
+
+    }
+
+    public void setPath(){
         drawPath = new Path();
+    }
+
+    public void setPaint(){
         drawPaint = new Paint();
         drawPaint.setColor(paintColor);
         drawPaint.setAntiAlias(true);
@@ -54,8 +75,8 @@ public class DrawingView extends View {
         drawPaint.setStyle(Paint.Style.STROKE);
         drawPaint.setStrokeJoin(Paint.Join.ROUND);
         drawPaint.setStrokeCap(Paint.Cap.ROUND);
-        canvasPaint = new Paint(Paint.DITHER_FLAG);
     }
+
 
     //size assigned to view
     @Override
@@ -65,11 +86,59 @@ public class DrawingView extends View {
         drawCanvas = new Canvas(canvasBitmap);
     }
 
+
+    ArrayList<DrawPath> paths = new ArrayList<>();
+    ArrayList<DrawPath> undoPaths = new ArrayList<>();
+
     //draw the view - will be called after touch event
     @Override
     protected void onDraw(Canvas canvas) {
+
+        canvas.drawColor(Color.WHITE);
         canvas.drawBitmap(canvasBitmap, 0, 0, canvasPaint);
-        canvas.drawPath(drawPath, drawPaint);
+
+        drawCanvas.drawPath(drawPath, drawPaint);
+       // lastdrawPaint = drawPaint;
+
+
+
+    }
+
+
+    public void addPath(Path drawPath, Paint drawPaint){
+
+        DrawPath dp = new DrawPath();
+        dp.paint = drawPaint;
+        dp.path = drawPath;
+        paths.add(dp);
+
+    }
+
+
+
+    public void undo(){
+        undoPaths.add(paths.get(paths.size() - 1));
+        paths.remove(paths.size() - 1);
+        drawPaths();
+    }
+
+    public void redo() {
+        paths.add(undoPaths.get(undoPaths.size()-1));
+        undoPaths.remove(undoPaths.size()-1);
+        drawPaths();
+    }
+
+    public void drawPaths(){
+        drawCanvas.drawColor(Color.WHITE);
+        for(DrawPath p:paths){
+            drawCanvas.drawPath(p.path, p.paint);
+        }
+        invalidate();
+    }
+
+    public class DrawPath{
+        public Path path;
+        public Paint paint;
     }
 
     //register user touches as drawing action
@@ -78,21 +147,30 @@ public class DrawingView extends View {
         float touchX = event.getX();
         float touchY = event.getY();
         //respond to down, move and up events
+
+
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 drawPath.moveTo(touchX, touchY);
+
                 break;
             case MotionEvent.ACTION_MOVE:
                 drawPath.lineTo(touchX, touchY);
                 break;
             case MotionEvent.ACTION_UP:
                 drawPath.lineTo(touchX, touchY);
-                drawCanvas.drawPath(drawPath, drawPaint);
-                drawPath.reset();
+                //drawCanvas.drawPath(drawPath, drawPaint);
+
+             /*   lastdrawPath = drawPath;
+                lastdrawPaint =  drawPaint;*/
+                addPath( drawPath,drawPaint);
+                setPath();
+                setPaint();
                 break;
             default:
                 return false;
         }
+
         //redraw
         invalidate();
         return true;
@@ -125,7 +203,13 @@ public class DrawingView extends View {
     //set erase true or false
     public void setErase(boolean isErase){
         erase=isErase;
-        if(erase) drawPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+
+        if(erase){
+
+            drawPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+
+        }
+
         else drawPaint.setXfermode(null);
     }
 
@@ -135,3 +219,4 @@ public class DrawingView extends View {
         invalidate();
     }
 }
+
